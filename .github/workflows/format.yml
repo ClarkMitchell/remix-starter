@@ -1,0 +1,45 @@
+name: Format
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.9.1
+
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Use Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Format
+        run: npm run format --if-present
+
+      - name: Commit
+        run: |
+          git config --local user.email "clarkmitchelldev@gmail.com"
+          git config --local user.name "🤖 clark-gunn Bot"
+
+          git add .
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "🤖 no formatting changed"
+            exit 0
+          fi
+          git commit --no-verify -m "chore: format" -m "formatted $GITHUB_SHA"
+          git push --no-verify
+          echo "🤖 pushed formatting changes https://github.com/$GITHUB_REPOSITORY/commit/$(git rev-parse HEAD)"

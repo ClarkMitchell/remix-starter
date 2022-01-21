@@ -1,0 +1,10 @@
+node_modules
+
+.eslintcache
+
+/.vscode
+/.cache
+/build
+/public/build
+/coverage
+.env
